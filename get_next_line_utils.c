@@ -6,7 +6,7 @@
 /*   By: abesombe <abesombe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 00:17:00 by abesombe          #+#    #+#             */
-/*   Updated: 2021/02/05 23:56:56 by abesombe         ###   ########.fr       */
+/*   Updated: 2021/02/06 22:05:46 by abesombe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ t_lst	*ft_lst_add_pushf(t_lst *lst, char *str, int fd)
 	return (new_elem);
 }
 
-int	ft_get_line(t_lst *lst_fd, t_lst *cur_fd, char **line, int choice)
+int		ft_get_line(t_lst *lst_fd, t_lst *cur_fd, char **line, int choice)
 {
 	int i;
 	char *tmp;
@@ -83,32 +83,30 @@ int	ft_get_line(t_lst *lst_fd, t_lst *cur_fd, char **line, int choice)
 	{
 		i = ft_char_index(cur_fd->str, '\n');
 		ft_strncpy(*line, cur_fd->str, 0, i);
-		//printf("\nline: [%s]", *line);
 		ft_strncpy(cur_fd->str, cur_fd->str, i + 1, ft_strlen(cur_fd->str) - i - 1);
 		return (1);
 	}
 	else if (!choice)
 	{
 		i = ft_char_index(lst_fd->str, '\n');
-		//printf("\ni: [%i]", i);
 		if (i >= 0)
 		{
 		tmp = malloc(i + 1);
-		//printf("\nlst_fd->str: [%s]", lst_fd->str);
 		ft_strncpy(tmp, lst_fd->str, 0, i);
-		//printf("\ntmp: [%s]", tmp);
 		*line = ft_strjoin(cur_fd->str, tmp);
-		//printf("\nline: [%s]", *line);
 		free(tmp);
 		cur_fd->str = malloc(ft_strlen(lst_fd->str) - i);
 		ft_strncpy(cur_fd->str, lst_fd->str, i + 1, ft_strlen(lst_fd->str) - i - 1);
-		//printf("\ncur_fd->str: [%s]", cur_fd->str);
 		return (1);
 		}
 		else
 		{
+		//	tmp = malloc(ft_strlen(cur_fd->str) + ft_strlen(lst_fd->str));
+		//	tmp = ft_strjoin(cur_fd->str, lst_fd->str);
 			cur_fd->str = ft_strjoin(cur_fd->str, lst_fd->str);
-		//	printf("\ncur_fd->str: [%s]", cur_fd->str);
+		//	free(lst_fd->str);
+		//	ft_strncpy(cur_fd->str, tmp, 0, ft_strlen(tmp));
+		//	free(tmp);
 		}
 	}
 	return (0);

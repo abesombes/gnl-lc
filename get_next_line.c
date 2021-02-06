@@ -6,11 +6,32 @@
 /*   By: abesombe <abesombe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 00:17:29 by abesombe          #+#    #+#             */
-/*   Updated: 2021/02/05 23:59:25 by abesombe         ###   ########.fr       */
+/*   Updated: 2021/02/06 22:14:57 by abesombe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+
+int	ft_clean_exit(t_lst *lst_fd, t_lst *cur_fd, int rcode)
+{
+	t_lst *tmp;
+
+	if (cur_fd)
+	{
+		if (cur_fd->str)
+			free(cur_fd->str);
+		free(cur_fd);
+	}
+	while (lst_fd)
+	{
+		if (lst_fd->str)
+			free(lst_fd->str);
+		tmp = lst_fd;
+		lst_fd = lst_fd->next;
+		free(tmp);
+	}
+	return (rcode);
+}
 
 size_t	ft_strlen(const char *str)
 {
@@ -74,30 +95,31 @@ int		get_next_line(int fd, char **line)
 	int				ret;
 
 	if (fd < 0 || BUFFER_SIZE < 1 || !line)
-		return (-1);
+		return (ft_clean_exit(lst_fd, NULL, -1));
 	if ((cur_fd = ft_search_fd(lst_fd, fd)))
 		if (ft_char_index(cur_fd->str, '\n') >= 0)
 			if (ft_get_line(lst_fd, cur_fd, line, 1))
-				return (1);
+				//return (ft_clean_exit(lst_fd, cur_fd, 1));
+		return (1);
 	if (!(buf = malloc(sizeof(char) * (BUFFER_SIZE + 1))))
+		//return (ft_clean_exit(lst_fd, cur_fd, -1));
 		return (-1);
-	lst_fd = ft_lst_add_pushf(lst_fd, buf, -2);
+	if (!(lst_fd = ft_lst_add_pushf(lst_fd, buf, -2)))
+	//	return (ft_clean_exit(lst_fd, cur_fd, -1));
+		return (-1);
 	while ((ret = read(fd, lst_fd->str, BUFFER_SIZE)) > 0)
 	{
-	//	printf("\nret: [%i]", ret);
 		(lst_fd->str)[ret] = '\0';
-
-		if (ret > 0)
-		{
-			if (!cur_fd)
-				cur_fd = ft_lst_add_pushb(lst_fd, NULL, fd);
-			if (ft_get_line(lst_fd, cur_fd, line, 0))
-				return (1);
-		}
+		if (!cur_fd)
+			if (!(cur_fd = ft_lst_add_pushb(lst_fd, NULL, fd)))
+			//	return (ft_clean_exit(lst_fd, cur_fd, -1));
+						return (-1);
+		if (ft_get_line(lst_fd, cur_fd, line, 0))
+		//	return (ft_clean_exit(lst_fd, cur_fd, 1));
+			return (1);
 	}
-//	printf("\nret: [%i] - fd: [%i] - lst_fd->str: [%s]", ret, fd, lst_fd->str);
-	//printf("\nFIN DU FICHIER - EOF");
-	return (0);
+//	return (ft_clean_exit(lst_fd, cur_fd, 0));
+		return (0);
 }
 
 int main(int ac, char **av)
@@ -114,9 +136,9 @@ int main(int ac, char **av)
     {
         i++;
  		printf("\n[line %d] - line = [%s] - ret: [%d] - fd: [%d]\n", i, line, ret, fd);
-	   // free(line);
+	  //  free(line);
     }
 	printf("%s    %d   %d\n", line, ret, fd);
-//	free(line);
+	//free(line);
     return (0);
 }
