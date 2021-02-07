@@ -6,7 +6,7 @@
 /*   By: abesombe <abesombe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 00:15:56 by abesombe          #+#    #+#             */
-/*   Updated: 2021/02/06 00:50:37 by abesombe         ###   ########.fr       */
+/*   Updated: 2021/02/07 16:14:04 by abesombe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ char	*ft_strjoin(char const *s1, char const *s2);
 t_lst	*ft_lst_add_pushb(t_lst *lst, char *str, int fd);
 t_lst	*ft_search_fd(t_lst *lst, int fd);
 int		ft_get_line(t_lst *lst_fd, t_lst *cur_fd, char **line, int choice);
-t_lst	*ft_lst_add_pushf(t_lst *lst, char *str, int fd);
+t_lst	*ft_lst_add_pushf(t_lst *lst, int buf_size, int fd);
 void	ft_strncpy(char *dest, char *src, int start_index, int size);
 int		ft_clean_exit(t_lst *lst_fd, t_lst *cur_fd, int rcode);
 

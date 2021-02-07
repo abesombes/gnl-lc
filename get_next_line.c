@@ -6,7 +6,7 @@
 /*   By: abesombe <abesombe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 00:17:29 by abesombe          #+#    #+#             */
-/*   Updated: 2021/02/06 22:14:57 by abesombe         ###   ########.fr       */
+/*   Updated: 2021/02/07 17:15:40 by abesombe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,6 @@ int		get_next_line(int fd, char **line)
 {
 	static t_lst	*lst_fd;
 	t_lst			*cur_fd;
-	char 			*buf;
 	int				ret;
 
 	if (fd < 0 || BUFFER_SIZE < 1 || !line)
@@ -99,46 +98,87 @@ int		get_next_line(int fd, char **line)
 	if ((cur_fd = ft_search_fd(lst_fd, fd)))
 		if (ft_char_index(cur_fd->str, '\n') >= 0)
 			if (ft_get_line(lst_fd, cur_fd, line, 1))
-				//return (ft_clean_exit(lst_fd, cur_fd, 1));
-		return (1);
-	if (!(buf = malloc(sizeof(char) * (BUFFER_SIZE + 1))))
-		//return (ft_clean_exit(lst_fd, cur_fd, -1));
+				return (1);
+	if (!(lst_fd = ft_lst_add_pushf(lst_fd, BUFFER_SIZE, -2)))
 		return (-1);
-	if (!(lst_fd = ft_lst_add_pushf(lst_fd, buf, -2)))
-	//	return (ft_clean_exit(lst_fd, cur_fd, -1));
-		return (-1);
+//		return (ft_clean_exit(lst_fd, cur_fd, -1));
 	while ((ret = read(fd, lst_fd->str, BUFFER_SIZE)) > 0)
 	{
 		(lst_fd->str)[ret] = '\0';
 		if (!cur_fd)
 			if (!(cur_fd = ft_lst_add_pushb(lst_fd, NULL, fd)))
+				return (-1);
 			//	return (ft_clean_exit(lst_fd, cur_fd, -1));
-						return (-1);
 		if (ft_get_line(lst_fd, cur_fd, line, 0))
-		//	return (ft_clean_exit(lst_fd, cur_fd, 1));
 			return (1);
 	}
+	if (ret < 0)
+		return (-1);
+	//	return (ft_clean_exit(lst_fd, cur_fd, -1));
+	return (ft_get_line(lst_fd, cur_fd, line, 2));
 //	return (ft_clean_exit(lst_fd, cur_fd, 0));
-		return (0);
 }
 
 int main(int ac, char **av)
 {
     int ret;
-    int fd;
+    int fd1;
+    int fd2;
     char *line;
 	(void)ac;
-    int i=0;
+   // int i=0;
 
-    fd = open(av[1], O_RDONLY);
+    fd1 = open(av[1], O_RDONLY);
+    fd2 = open(av[2], O_RDONLY);
+	ret = get_next_line(fd1, &line);
+	printf("\n[line %d] - line = [%s] - ret: [%d] - fd: [%d]\n", 0, line, ret, fd1);
+	free(line);
+	ret = get_next_line(fd2, &line);
+	printf("\n[line %d] - line = [%s] - ret: [%d] - fd: [%d]\n", 0, line, ret, fd2);
+	free(line);
+	ret = get_next_line(fd2, &line);
+	printf("\n[line %d] - line = [%s] - ret: [%d] - fd: [%d]\n", 1, line, ret, fd2);
+	free(line);
+	ret = get_next_line(fd1, &line);
+	printf("\n[line %d] - line = [%s] - ret: [%d] - fd: [%d]\n", 1, line, ret, fd1);
+	free(line);
+	ret = get_next_line(fd1, &line);
+	printf("\n[line %d] - line = [%s] - ret: [%d] - fd: [%d]\n", 2, line, ret, fd1);
+	free(line);
+	ret = get_next_line(fd1, &line);
+	printf("\n[line %d] - line = [%s] - ret: [%d] - fd: [%d]\n", 3, line, ret, fd1);
+	ret = get_next_line(fd1, &line);
+	printf("\n[line %d] - line = [%s] - ret: [%d] - fd: [%d]\n", 4, line, ret, fd1);
+	free(line);
+	ret = get_next_line(fd2, &line);
+	printf("\n[line %d] - line = [%s] - ret: [%d] - fd: [%d]\n", 2, line, ret, fd2);
+	free(line);
+	ret = get_next_line(fd2, &line);
+	printf("\n[line %d] - line = [%s] - ret: [%d] - fd: [%d]\n", 3, line, ret, fd2);
+	free(line);
+	ret = get_next_line(fd1, &line);
+	printf("\n[line %d] - line = [%s] - ret: [%d] - fd: [%d]\n", 5, line, ret, fd1);
+	free(line);
+	ret = get_next_line(fd1, &line);
+	printf("\n[line %d] - line = [%s] - ret: [%d] - fd: [%d]\n", 6, line, ret, fd1);
+	free(line);
+	ret = get_next_line(fd2, &line);
+	printf("\n[line %d] - line = [%s] - ret: [%d] - fd: [%d]\n", 4, line, ret, fd2);
+	free(line);
+	ret = get_next_line(fd2, &line);
+	printf("\n[line %d] - line = [%s] - ret: [%d] - fd: [%d]\n", 5, line, ret, fd2);
+	free(line);
+	ret = get_next_line(fd1, &line);
+	printf("\n[line %d] - line = [%s] - ret: [%d] - fd: [%d]\n", 7, line, ret, fd1);
+	free(line);
 
-    while ((ret = get_next_line(fd, &line)) > 0)
+   /* while ((ret = get_next_line(fd1, &line)) > 0)
     {
         i++;
- 		printf("\n[line %d] - line = [%s] - ret: [%d] - fd: [%d]\n", i, line, ret, fd);
+ 		printf("\n[line %d] - line = [%s] - ret: [%d] - fd: [%d]\n", i, line, ret, fd1);
 	  //  free(line);
     }
-	printf("%s    %d   %d\n", line, ret, fd);
+	printf("%s    %d   %d\n", line, ret, fd);*/
 	//free(line);
     return (0);
 }
