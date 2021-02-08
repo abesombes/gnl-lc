@@ -6,7 +6,7 @@
 /*   By: abesombe <abesombe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 00:17:00 by abesombe          #+#    #+#             */
-/*   Updated: 2021/02/08 14:55:47 by abesombe         ###   ########.fr       */
+/*   Updated: 2021/02/08 18:40:19 by abesombe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,37 +45,34 @@ t_lst	*ft_search_fd(t_lst *lst, int fd)
 	return (0);
 }
 
-t_lst	*ft_lst_add_pushb(t_lst *lst, char *str, int fd)
+t_lst	*ft_lst_add_push(t_lst *lst, int fd, int bs)
 {
 	t_lst	*new_elem;
 	t_lst	*tmp;
 
-	tmp = lst;
 	if (!(new_elem=(t_lst *)malloc(sizeof(t_lst))))
 		return (NULL);
-	while (tmp->next)
-		tmp = tmp->next;
-	new_elem->str = str;
-	new_elem->fd = fd;
-	new_elem->next = NULL;
-	tmp->next = new_elem;
+	if (bs >= 0)
+	{
+		if (!(new_elem->str = (char *)malloc(sizeof(char) * (bs + 1))))
+			return (NULL);
+		new_elem->fd = fd;
+		new_elem->next = lst;
+	}
+	else
+	{
+		tmp = lst;
+		while (tmp->next)
+			tmp = tmp->next;
+		new_elem->str = NULL;
+		new_elem->fd = fd;
+		new_elem->next = NULL;
+		tmp->next = new_elem;
+	}
 	return (new_elem);
 }
 
-t_lst	*ft_lst_add_pushf(t_lst *lst, int buf_size, int fd)
-{
-	t_lst	*new_elem;
-
-	if (!(new_elem = (t_lst *)malloc(sizeof(t_lst))))
-		return (NULL);
-	if (!(new_elem->str = (char *)malloc(sizeof(char) * (buf_size + 1))))
-		return (NULL);
-	new_elem->fd = fd;
-	new_elem->next = lst;
-	return (new_elem);
-}
-
-int		ft_get_line(t_lst *lst_fd, t_lst *cur_fd, char **line, int choice)
+int		ft_get_line(t_lst *cur_fd, char **line, int choice)
 {
 	int i;
 
@@ -99,31 +96,32 @@ int		ft_get_line(t_lst *lst_fd, t_lst *cur_fd, char **line, int choice)
 		free(cur_fd->tmp);
 		return (1);
 	}
-	else if (choice == 0)
+	return (0);
+}
+
+int		ft_merge_into_line(t_lst *lst_fd, t_lst *cur_fd, char **line)
+{
+	int i;
+
+	if ((i = ft_char_index(lst_fd->str, '\n')) >= 0)
 	{
-		if ((i = ft_char_index(lst_fd->str, '\n')) >= 0)
-		{
-			cur_fd->tmp = malloc(sizeof(char) * (i + 1));
-			cur_fd->tmp2 = malloc(sizeof(char) * (ft_strlen(cur_fd->str) + 1));
-			ft_strncpy(cur_fd->tmp2, cur_fd->str, 0, ft_strlen(cur_fd->str));
-			ft_strncpy(cur_fd->tmp, lst_fd->str, 0, i);
-			free(cur_fd->str);
-			*line = ft_strjoin(cur_fd->tmp2, cur_fd->tmp);
-			cur_fd->str = malloc(sizeof(char) * (ft_strlen(lst_fd->str) - i));
-			ft_strncpy(cur_fd->str, lst_fd->str, i + 1, ft_strlen(lst_fd->str) - i - 1);
-			free(lst_fd->str);
-			free(cur_fd->tmp);
-			free(cur_fd->tmp2);
-			return (1);
-		}
-		else
-		{
-			cur_fd->tmp = malloc(ft_strlen(cur_fd->str) + 1);
-			ft_strncpy(cur_fd->tmp, cur_fd->str, 0, ft_strlen(cur_fd->str));
-			free(cur_fd->str);
-			cur_fd->str = ft_strjoin(cur_fd->tmp, lst_fd->str);
-			free(cur_fd->tmp);
-		}
+		cur_fd->tmp = malloc(sizeof(char) * (i + 1));
+		cur_fd->tmp2 = malloc(sizeof(char) * (ft_strlen(cur_fd->str) + 1));
+		ft_strncpy(cur_fd->tmp2, cur_fd->str, 0, ft_strlen(cur_fd->str));
+		ft_strncpy(cur_fd->tmp, lst_fd->str, 0, i);
+		free(cur_fd->str);
+		*line = ft_strjoin(cur_fd->tmp2, cur_fd->tmp);
+		cur_fd->str = malloc(sizeof(char) * (ft_strlen(lst_fd->str) - i));
+		ft_strncpy(cur_fd->str, lst_fd->str, i + 1, ft_strlen(lst_fd->str) - i - 1);
+		free(lst_fd->str);
+		free(cur_fd->tmp);
+		free(cur_fd->tmp2);
+		return (1);
 	}
+	cur_fd->tmp = malloc(ft_strlen(cur_fd->str) + 1);
+	ft_strncpy(cur_fd->tmp, cur_fd->str, 0, ft_strlen(cur_fd->str));
+	free(cur_fd->str);
+	cur_fd->str = ft_strjoin(cur_fd->tmp, lst_fd->str);
+	free(cur_fd->tmp);
 	return (0);
 }

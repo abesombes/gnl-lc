@@ -6,26 +6,18 @@
 /*   By: abesombe <abesombe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 00:17:29 by abesombe          #+#    #+#             */
-/*   Updated: 2021/02/08 14:54:15 by abesombe         ###   ########.fr       */
+/*   Updated: 2021/02/08 18:23:32 by abesombe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	ft_clean_exit(t_lst *lst_fd, t_lst *cur_fd, int rcode)
+int	ft_clean_exit(t_lst *lst_fd, int rcode)
 {
 	t_lst *tmp;
 
-	if (cur_fd)
+	while (lst_fd->next)
 	{
-		if (cur_fd->str)
-			free(cur_fd->str);
-		free(cur_fd);
-	}
-	while (lst_fd)
-	{
-		if (lst_fd->str)
-			free(lst_fd->str);
 		tmp = lst_fd;
 		lst_fd = lst_fd->next;
 		free(tmp);
@@ -95,26 +87,24 @@ int		get_next_line(int fd, char **line)
 
 	if (fd < 0 || BUFFER_SIZE < 1 || !line)
 		return (-1);
-	if (!(lst_fd = ft_lst_add_pushf(lst_fd, BUFFER_SIZE, -2)))
+	if (!(lst_fd = ft_lst_add_push(lst_fd, -2, BUFFER_SIZE)))
 		return (-1);
 	if ((cur_fd = ft_search_fd(lst_fd, fd)))
 		if (ft_char_index(cur_fd->str, '\n') >= 0)
-			if (ft_get_line(lst_fd, cur_fd, line, 1))
+			if (ft_get_line(cur_fd, line, 1))
 				return (1);
 	while ((ret = read(fd, lst_fd->str, BUFFER_SIZE)) > 0)
 	{
 		(lst_fd->str)[ret] = '\0';
-		printf("\nret: [%i] - lst_fd: [%s]", ret, lst_fd->str);
 		if (!cur_fd)
-			if (!(cur_fd = ft_lst_add_pushb(lst_fd, NULL, fd)))
+			if (!(cur_fd = ft_lst_add_push(lst_fd, fd, -1)))
 				return (-1);
-		if (ft_get_line(lst_fd, cur_fd, line, 0))
+		if (ft_merge_into_line(lst_fd, cur_fd, line))
 			return (1);
 	}
 	if (ret < 0)
 		return (-1);
-//	return (0);
-	return (ft_get_line(lst_fd, cur_fd, line, 2));
+	return (ft_get_line(cur_fd, line, 2));
 }
 
 int main(int ac, char **av)
