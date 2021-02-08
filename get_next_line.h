@@ -6,7 +6,7 @@
 /*   By: abesombe <abesombe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 00:15:56 by abesombe          #+#    #+#             */
-/*   Updated: 2021/02/07 16:14:04 by abesombe         ###   ########.fr       */
+/*   Updated: 2021/02/08 14:44:11 by abesombe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ struct          s_lst
 {
 	int		fd;
 	char	*str;
+	char	*tmp;
+	char	*tmp2;
 	t_lst	*next;
 };
 
@@ -37,6 +39,7 @@ int		ft_get_line(t_lst *lst_fd, t_lst *cur_fd, char **line, int choice);
 t_lst	*ft_lst_add_pushf(t_lst *lst, int buf_size, int fd);
 void	ft_strncpy(char *dest, char *src, int start_index, int size);
 int		ft_clean_exit(t_lst *lst_fd, t_lst *cur_fd, int rcode);
+void	check_leaks();
 
 #endif
 

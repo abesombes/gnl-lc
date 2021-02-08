@@ -6,7 +6,7 @@
 /*   By: abesombe <abesombe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 00:17:00 by abesombe          #+#    #+#             */
-/*   Updated: 2021/02/07 17:03:17 by abesombe         ###   ########.fr       */
+/*   Updated: 2021/02/08 14:55:47 by abesombe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,13 +65,11 @@ t_lst	*ft_lst_add_pushb(t_lst *lst, char *str, int fd)
 t_lst	*ft_lst_add_pushf(t_lst *lst, int buf_size, int fd)
 {
 	t_lst	*new_elem;
-	char	*buf;
 
 	if (!(new_elem = (t_lst *)malloc(sizeof(t_lst))))
 		return (NULL);
-	if (!(buf = (char *)malloc(sizeof(char) * (buf_size + 1))))
+	if (!(new_elem->str = (char *)malloc(sizeof(char) * (buf_size + 1))))
 		return (NULL);
-	new_elem->str = buf;
 	new_elem->fd = fd;
 	new_elem->next = lst;
 	return (new_elem);
@@ -80,10 +78,10 @@ t_lst	*ft_lst_add_pushf(t_lst *lst, int buf_size, int fd)
 int		ft_get_line(t_lst *lst_fd, t_lst *cur_fd, char **line, int choice)
 {
 	int i;
-	char *tmp;
+
 	if (choice == 2)
 	{
-		*line = malloc(ft_strlen(cur_fd->str));
+		*line = malloc(ft_strlen(cur_fd->str) + 1);
 		ft_strncpy(*line, cur_fd->str, 0, ft_strlen(cur_fd->str));
 		free(cur_fd->str);
 		return (0);
@@ -91,35 +89,40 @@ int		ft_get_line(t_lst *lst_fd, t_lst *cur_fd, char **line, int choice)
 	else if (choice == 1)
 	{
 		i = ft_char_index(cur_fd->str, '\n');
-		*line = malloc(i);
-		ft_strncpy(*line, cur_fd->str, 0, i);
-		tmp = malloc(ft_strlen(cur_fd->str) - i);
-		ft_strncpy(tmp, cur_fd->str, i + 1, ft_strlen(cur_fd->str) - i - 1);
+		cur_fd->tmp = malloc(ft_strlen(cur_fd->str) + 1);
+		ft_strncpy(cur_fd->tmp, cur_fd->str, 0, ft_strlen(cur_fd->str));
 		free(cur_fd->str);
-		cur_fd->str = tmp;
+		cur_fd->str = malloc(ft_strlen(cur_fd->tmp) - i);
+		*line = malloc(i + 1);
+		ft_strncpy(*line, cur_fd->tmp, 0, i);
+		ft_strncpy(cur_fd->str, cur_fd->tmp, i + 1, ft_strlen(cur_fd->tmp) - i);
+		free(cur_fd->tmp);
 		return (1);
 	}
 	else if (choice == 0)
 	{
 		if ((i = ft_char_index(lst_fd->str, '\n')) >= 0)
 		{
-		tmp = malloc(i + 1);
-		ft_strncpy(tmp, lst_fd->str, 0, i);
-		*line = ft_strjoin(cur_fd->str, tmp);
-		free(tmp);
-		free(cur_fd->str);
-		cur_fd->str = malloc(ft_strlen(lst_fd->str) - i - 1);
-		ft_strncpy(cur_fd->str, lst_fd->str, i + 1, ft_strlen(lst_fd->str) - i - 1);
-		free(lst_fd->str);
-		return (1);
+			cur_fd->tmp = malloc(sizeof(char) * (i + 1));
+			cur_fd->tmp2 = malloc(sizeof(char) * (ft_strlen(cur_fd->str) + 1));
+			ft_strncpy(cur_fd->tmp2, cur_fd->str, 0, ft_strlen(cur_fd->str));
+			ft_strncpy(cur_fd->tmp, lst_fd->str, 0, i);
+			free(cur_fd->str);
+			*line = ft_strjoin(cur_fd->tmp2, cur_fd->tmp);
+			cur_fd->str = malloc(sizeof(char) * (ft_strlen(lst_fd->str) - i));
+			ft_strncpy(cur_fd->str, lst_fd->str, i + 1, ft_strlen(lst_fd->str) - i - 1);
+			free(lst_fd->str);
+			free(cur_fd->tmp);
+			free(cur_fd->tmp2);
+			return (1);
 		}
 		else
 		{
-			tmp = ft_strjoin(cur_fd->str, lst_fd->str);
+			cur_fd->tmp = malloc(ft_strlen(cur_fd->str) + 1);
+			ft_strncpy(cur_fd->tmp, cur_fd->str, 0, ft_strlen(cur_fd->str));
 			free(cur_fd->str);
-			cur_fd->str = malloc(ft_strlen(tmp) + 1);
-			ft_strncpy(cur_fd->str, tmp, 0, ft_strlen(tmp));
-			free(tmp);
+			cur_fd->str = ft_strjoin(cur_fd->tmp, lst_fd->str);
+			free(cur_fd->tmp);
 		}
 	}
 	return (0);
